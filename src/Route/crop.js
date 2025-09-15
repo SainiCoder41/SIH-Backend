@@ -13,16 +13,11 @@ router.post("/crop-recommendation", async (req, res) => {
 
     console.log("Running Python script at:", pythonScript);
 
-    const pythonProcess = spawn("python", [
-      pythonScript,
-      N,
-      P,
-      K,
-      temperature,
-      humidity,
-      ph,
-      rainfall,
-    ]);
+ const pythonProcess = spawn("python3", [
+  pythonScript,
+  N, P, K, temperature, humidity, ph, rainfall
+]);
+
 
     let result = "";
     pythonProcess.stdout.on("data", (data) => {
