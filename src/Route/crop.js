@@ -55,17 +55,16 @@ cropRecommendation.post("/agri-data", async (req, res) => {
 
     // Run Python crop recommendation script
     const pythonScript = path.join(__dirname, "predict_output.py");
-   const pythonProcess = spawn("python3", [
-  pythonScript,
-  nitrogen || 0,     // Nitrogen
-  phosphorus || 0,   // Phosphorus
-  potassium || 0,    // Potassium
-  temperature || 0,  // Temperature
-  humidity || 0,     // Humidity
-  ph || 0,           // Soil pH
-  rainfall || 0      // Rainfall
-]);
-
+    const pythonProcess = spawn("python3", [
+      pythonScript,
+      nitrogen,
+      0, // placeholder for P (you can adjust later)
+      0, // placeholder for K
+      temperature,
+      humidity,
+      ph,
+      0, // placeholder for rainfall (if not from weatherAPI, maybe another API)
+    ]);
 
     let cropResult = "";
     pythonProcess.stdout.on("data", (data) => {
