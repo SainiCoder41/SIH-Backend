@@ -55,7 +55,7 @@ cropRecommendation.post("/agri-data", async (req, res) => {
 
     // Run Python crop recommendation script
     const pythonScript = path.join(__dirname, "predict_output.py");
-    const pythonProcess = spawn("python3", [
+    const pythonProcess = spawn("python", [
       pythonScript,
       nitrogen,
       0, // placeholder for P (you can adjust later)

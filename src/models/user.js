@@ -7,18 +7,10 @@ const userSchema = new Schema({
         minLength:3,
         maxLength:40
     },
-    emailId:{
-        type:String,
-        required:true,
-        unique:true,
-        trim:true,
-        lowercase:true,
-        immutable:true,
-
-    },
+    
     role:{
         type:String,
-        enum:["user","admin"],
+        enum:["user","admin","business"],
         default:'user'
     },
     premium:{
@@ -29,7 +21,7 @@ const userSchema = new Schema({
         type:String,
         required:true
 
-    }
+    },
     
 },{timestamps:true})
 
