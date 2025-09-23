@@ -4,6 +4,7 @@ const soilRoute = require("./Route/soilRoute");
 const weatherRoute = require("./Route/weatherData")
 const cropRecommendation = require("./Route/crop");
 const cropChatbot = require("./Route/cropChatbot");
+const cookieParser = require('cookie-parser');
 const cropPricePredictation = require('./Route/cropPricePredictation');
 const cors = require('cors');
 
@@ -11,9 +12,10 @@ const  userAuthRouter = require("./Route/UserAuth");
 const main = require("./config/db");
 require('dotenv').config();
 
+app.use(cookieParser());
 
 app.use(cors({
-    origin: ' http://localhost:8081',
+    origin: 'http://localhost:5173',
     credentials: true 
 }))
 app.use(express.json());

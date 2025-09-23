@@ -1,74 +1,66 @@
-const User = require("../models/user");
-const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const User = require("../models/user");
 
-const register = async(req ,res)=>{
-    try{
-        const {fullName,emailId, password} = req.body;
-        req.body.password = await bcrypt.hash(password,10);
-        req.body.role = "user";
-             const user =  await User.create(req.body);
-                  const token =  jwt.sign({_id:user._id , emailId:emailId, role:'user'},process.env.JWT_KEY);
+const register = async (req, res) => {
+  try {
+    const { name, mobileNumber, state, district, village, language } = req.body;
 
-         const reply = {
-        firstName: user.firstName,
-        emailId: user.emailId,
-          role:user.role,
-          premium:user.premium,
-        _id: user._id,
+    if (!name || !mobileNumber) {
+      return res.status(400).json({ message: "Name and Mobile Number are required" });
     }
-     res.status(201).json({
-        user:reply,
-        message:"User Register Successfully"
-    })
-    res.cookie("token", token, {
-  httpOnly: true,
-  secure: true,
-  sameSite: "None",
-});
-    }catch(err){
-        res.status(400).send("Error "+err);
 
-    }
-}
-const login = async (req,res)=>{
-    try{
-        const {emailId,password}= req.body;
-        if(!emailId)
-            throw new Error("Invalid Credentails");
-        if(!password)
-            throw new Error("Invalid Credentails");
+    // Check if user already exists (optional)
+    // let existingUser = await User.findOne({ mobileNumber });
+    // if (existingUser) {
+    //   return res.status(400).json({ message: "User already registered with this mobile number" });
+    // }
 
-        const user = await User.findOne({emailId});
-        const match = await bcrypt.compare(password,user.password);
-
-        if(!match)
-            throw new Error("Invalid Credentails");
-
-        const reply = {
-          firstName:user.firstName,
-          emailId:user.emailId,
-            role:user.role,
-            premium:user.premium,
-            _id:user._id,
-        
-        }
-
-     const token = jwt.sign({ _id: user._id, emailId:emailId,role:user.role }, process.env.JWT_KEY);
-res.cookie("token", token, {
-  httpOnly: true,
-  secure: true,
-  sameSite: "None"
-});
-
-
-    res.status(201).json({
-      user:reply,
-      message:"Loggin Succesfully"
+    // ✅ Correct: don't redeclare User
+    const user = await User.create({
+      name,
+      mobileNumber,
+      state,
+      district,
+      village,
+      language,
+      role: "user",
+      premium: false,
     });
 
-    }catch(err){
-        res.status(401).send("Error : "+err);
-    }
-}
-module.exports = {register,login};
+    // Generate JWT token (⚠️ no expiry as you wanted)
+    const token = jwt.sign(
+      { _id: user._id, mobileNumber: user.mobileNumber, role: user.role },
+      process.env.JWT_KEY
+    );
+
+    // Set cookie
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: true, // use true in production with https
+      sameSite: "None",
+    });
+
+    // Send response
+    const reply = {
+      name: user.name,
+      mobileNumber: user.mobileNumber,
+      state: user.state,
+      district: user.district,
+      village: user.village,
+      language: user.language,
+      role: user.role,
+      premium: user.premium,
+      _id: user._id,
+    };
+
+    return res.status(201).json({
+      user: reply,
+      token,
+      message: "User Registered Successfully",
+    });
+  } catch (err) {
+    return res.status(400).json({ message: "Error: " + err.message });
+  }
+};
+
+module.exports = { register };
